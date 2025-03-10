@@ -1,0 +1,209 @@
+/* Header Styles */
+.header {
+    background-color: #1a1a1a;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: white;
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+/* Impostazioni di base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    width: 80%;
+    max-width: 800px;
+    margin: 60px auto;
+    background: #222;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    color: white;
+}
+
+header h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #ffffff;
+    font-size: 2em;
+    font-weight: normal;
+}
+
+/* Contenitore scrollabile */
+.scroll-container {
+    height: 595px;
+    overflow-y: auto;
+    border: 1px solid #444;
+    padding: 15px;
+    border-radius: 5px;
+    background: #1a1a1a;
+    scrollbar-width: auto; /* Può essere auto, thin, o none */
+    scrollbar-color: #525050 #222;
+}
+
+/* Stile delle card utente */
+.user-card {
+    background-color: #333;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.user-info {
+    flex-grow: 1;
+}
+
+.user-info h3 {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.user-info p {
+    font-size: 0.9em;
+    margin-bottom: 5px;
+}
+
+/* Stile per lo stato */
+.status {
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.status.premium {
+    color: #4CAF50;
+}
+
+.status.free {
+    color: #f44336;
+}
+
+/* Stile del bottone */
+.button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+.button-toggle {
+    background-color: #4CAF50;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.button-toggle:hover {
+    background-color: #388E3C;
+}
+
+.button-red {
+    background-color: red;
+    color: white; /* Per rendere visibile il testo */
+}
+.button-red:hover {
+    background-color: rgb(216, 9, 9);
+}
+/* Stile della barra di ricerca */
+.search-bar {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 1em;
+    border: 2px solid #3b82f6;
+    border-radius: 5px;
+    background-color: #222;
+    color: white;
+}
+
+/* Contenitore scrollabile con altezza fissa */
+.scroll-container {
+    max-height: 575px;
+    overflow-y: auto;
+    border: 3px solid #3b82f6;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #222;
+}
+
+/* Miglioramento visibilità */
+.user-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 10px;
+}
+
+.user-card h3 {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: white;
+}
+
+.user-card p {
+    font-size: 0.9em;
+    color: #ccc;
+}
+
+
+/* Stile del pulsante di logout */
+.logout-button {
+    background: none; /* Nessun fondo */
+    border: none; /* Nessun bordo */
+    color: white; /* Colore del testo grigio scuro */
+    font-size: 16px; /* Dimensione del testo */
+    font-weight: 600; /* Testo in grassetto */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    transition: color 0.3s, text-decoration-color 0.3s, background-color 0.3s;
+}
+
+/* Icona della porta d'uscita accanto al testo */
+.logout-icon {
+    margin-right: 10px; /* Spazio tra l'icona e il testo */
+    width: 18px; /* Dimensione dell'icona */
+    height: 18px;
+    stroke: white; /* Colore dell'icona grigio scuro */
+}
+
+/* Hover sul pulsante di logout */
+.logout-button:hover {
+    text-decoration: underline; /* Aggiungi sottolineatura al passaggio del mouse */
+}
+

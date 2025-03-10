@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novelist Space - Login/Signup</title>
+    <link rel="stylesheet" href="../Styles/login_style.css">
+</head>
+<body>
+    <header class="header">
+        <a href="" class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                </path>
+            </svg>
+            <span class="logo-text">Novelist Space - Admin Login</span>
+        </a>
+    </header>
+
+    <main class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1 class="auth-title">Novelist Space - Admin Area</h1>
+                <p class="auth-subtitle">Login as Admin to manage users</p>
+            </div>
+
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Login</div>
+            </div>
+
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" class="form-input" placeholder="Enter your username" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password" required>
+                </div>
+
+                <div id="message" class="error"></div>
+                
+                <button type="submit" class="form-button">Login</button>
+                
+            
+            </form>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 Novelist Space. All rights reserved.</p>
+    </footer>
+
+    <script>
+
+        // Validazione form di login
+        const loginForm = document.getElementById('loginForm');
+        
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            //invio dati al backend php
+            fetch('be_login_admin.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json(); // Converte la risposta in JSON                      
+                } else {
+                    // Se il login fallisce, mostra un messaggio di errore
+                    throw new Error("Errore:risposta be_login_admin.php non valida");
+                }
+            })
+            .then(data => {
+                if (data.status == "success") {
+                    // Se la connessione è riuscita, reindirizza l'utente
+                    //sessionStorage.setItem('sessionActive', 'true');
+                    window.location.href = 'admin_panel.php';
+                } else {// se il db non è raggiungibile o le credenziali sono errate
+                    message.className = 'error';
+                    message.textContent = data.message;
+                }
+            })
+            .catch(error => {
+                console.error('Errore durante il login:', error);
+                document.getElementById('responseMessage').textContent = 'Errore: file login non disponibile.';
+            });
+
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+/* Header Styles */
+.header {
+    background-color: #1a1a1a;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: white;
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.user-info {
+    /*margin-left: 5px;*/
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.account-status {
+    font-size: 1.3rem;
+    /*font-weight: bold;*/
+    color: #ff0000; /* Colore per lo stato dell'account (ad esempio, Premium) */
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #1a1a1a;
+    color: white;
+    min-height: 100vh;
+}
+
+.navbar {
+    background-color: #242424;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nav-links {
+    margin-left: 900px;
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.3rem;
+}
+
+.nav-links:hover {
+    text-decoration: underline;
+}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.search-form {
+    width: 100%;
+    max-width: 400px;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 800px;
+}
+
+.search-bar {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    background-color: #2a2a2a;
+    color: white;
+    font-size: 1rem;
+}
+
+.search-button {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #555;
+}
+
+.search-button:hover {
+    color: #000;
+}
+
+
+.main-content {
+    padding: 2rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    /*margin-left: 2.5rem;*/
+}
+
+.filter-tag {
+    background-color: #333;
+    color: white; /* Testo bianco per contrasto */
+    padding: 0.5rem 1rem;
+    border: none; /* Rimuove il bordo predefinito del button */
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    outline: none; /* Evita il contorno blu su focus nei browser */
+}
+
+/* Cambia colore al passaggio del mouse */
+.filter-tag:hover {
+    background-color: #555;
+}
+
+.filter-tag.active {
+    border: 2px solid #3b82f6;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .featured-novels {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Stile del pulsante di logout */
+.logout-button {
+    background: none; /* Nessun fondo */
+    border: none; /* Nessun bordo */
+    color: white; /* Colore del testo grigio scuro */
+    font-size: 16px; /* Dimensione del testo */
+    font-weight: 600; /* Testo in grassetto */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    transition: color 0.3s, text-decoration-color 0.3s, background-color 0.3s;
+}
+
+/* Icona della porta d'uscita accanto al testo */
+.logout-icon {
+    margin-right: 10px; /* Spazio tra l'icona e il testo */
+    width: 18px; /* Dimensione dell'icona */
+    height: 18px;
+    stroke: white; /* Colore dell'icona grigio scuro */
+}
+
+/* Hover sul pulsante di logout */
+.logout-button:hover {
+    text-decoration: underline; /* Aggiungi sottolineatura al passaggio del mouse */
+}
+
+.novels-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 colonne */
+    gap: 20px; /* Spaziatura tra le card */
+    padding: 20px;
+    justify-content: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-top: 6px;
+}
+
+.novel-card {
+    background: linear-gradient(to bottom, #fdf7e3, #f6e6c2);
+    border: 5px solid #3b82f6;
+    border-radius: 15px;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: black;
+    padding: 15px;
+    height: 250px;
+    width: 335px;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 0px;
+}
+
+/* Titolo con riga sotto */
+.novel-card h3 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+.novel-info {
+    font-size: 1.15rem;
+    text-align: left;
+    margin-bottom: 4px;
+}
+
+/* Contenuto informazioni */
+.novel-card .info {
+    flex-grow: 1; /* Occupa lo spazio centrale */
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.premium {
+    border: 5px solid gold;
+    position: relative;
+}
+
+.premium::before {
+    content: "Premium";
+    background: gold;
+    color: black;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 12px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+.details-button {
+    display: flex;
+    margin-top: 10px;
+    background: #2196F3;
+    color: white;
+    padding: 8px 8px;
+    text-align: center;
+    border: 0px;
+    border-radius: 5px;
+    width: 140px;
+    text-decoration: none;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-left: 82px;
+}
+
+.details-button:hover {
+    background: #1976D2;
+}
+
+.locked {
+    background: gold;
+    cursor: not-allowed;
+}
+
+.locked:hover {
+    background: rgba(201, 171, 4, 0.938);
+}
+
+.unlocked {
+    background: gold;
+}
+
+.unlocked:hover {
+    background: rgba(201, 171, 4, 0.938);
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.prev-button, .next-button {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.current-page {
+    font-size: 1.2rem;
+    color: white;
+}
+
+.page-arrow svg {
+    stroke: white;
+    width: 28px;
+    height: 18px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.page-arrow:hover svg {
+    transform: scale(1.2); /* Effetto ingrandimento */
+}
+
+.no-results {
+    display: flex;
+    justify-content: center;  /* Centra orizzontalmente */
+    align-items: center;  /* Centra verticalmente */
+    height: 40vh; /* Occupa il 60% della viewport height */
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom:150px;
+}
