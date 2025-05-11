@@ -1,0 +1,2 @@
+# Ignora i files SMTP nella cartella secrets
+secrets/smtp_*

@@ -1,0 +1,70 @@
+FROM php:7.4-apache
+
+# Enable SSL modules
+RUN a2enmod ssl rewrite headers
+
+# Copy HTTPS cert and key, and then set permissions (read-only)
+COPY ./ssl/webapp/server-cert.pem /etc/apache2/ssl/server-cert.pem
+COPY ./ssl/webapp/server-key.pem /etc/apache2/ssl/server-key.pem 
+RUN chown -R www-data:www-data /etc/apache2/ssl && \
+    chmod 400 /etc/apache2/ssl/server-cert.pem && chmod 400 /etc/apache2/ssl/server-key.pem
+
+# Copy apache conf and enable tls
+COPY config/apache-ssl.conf /etc/apache2/sites-available/default-ssl.conf
+RUN a2ensite default-ssl.conf
+
+# Copy client cert and key for DB
+COPY ./ssl/webapp/client-cert.pem /etc/mysql_client/ssl/client-cert.pem
+COPY ./ssl/webapp/client-key.pem /etc/mysql_client/ssl/client-key.pem
+COPY ./ssl/ca.pem /etc/mysql_client/ssl/ca.pem
+RUN chown www-data:www-data -R /etc/mysql_client && \
+    chmod 400 /etc/mysql_client/ssl/*
+
+# Create www-data_secrets directory (to insert secrets)
+RUN mkdir /run/www-data_secrets && chown www-data:www-data -R /run/www-data_secrets
+
+# Copy DB connection file outside the working directory
+COPY config_db.php /var/www/mysql_client/config_db.php
+RUN chown www-data:www-data -R /var/www/mysql_client
+
+# Idem for SMTP connection
+COPY smtp_config/ /var/www/smtp/
+RUN chown www-data:www-data -R /var/www/smtp 
+
+# Create a log directory
+RUN mkdir /var/www/novelist_logs && \
+    chown www-data:www-data -R /var/www/novelist_logs/
+
+# Install PHP extensions and other dependencies
+RUN apt update && apt install -y \
+    libzip-dev zip unzip &&  apt install -y openssl && \
+    docker-php-ext-install zip && \
+    docker-php-ext-install pdo pdo_mysql
+
+WORKDIR /var/www/app
+
+# Install any needed packages specified in composer.json
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+    php composer-setup.php && \
+    php -r "unlink('composer-setup.php');" && \
+    mv composer.phar /usr/local/bin/composer
+
+# Install dependencies
+RUN composer require phpmailer/phpmailer && \
+    composer require ezyang/htmlpurifier
+
+COPY sanitizer.php /var/www/app/sanitizer.php
+COPY logger.php /var/www/app/logger.php
+    
+# Set app directory for www-data user
+RUN chown -R www-data:www-data /var/www/app
+
+# Make port 80 and 443 available 
+EXPOSE 80
+EXPOSE 443
+
+# Set the working directory
+WORKDIR /var/www/html
+
+# Copy the current directory contents into the container at /usr/src/myapp
+COPY public/ /var/www/html

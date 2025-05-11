@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novelist Space - Login/Signup</title>
+    <link rel="stylesheet" href="/Styles/login_style.css">
+</head>
+<body>
+    <header class="header">
+        <a href="/index.html" class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                </path>
+            </svg>
+            <span class="logo-text">Novelist Space</span>
+        </a>
+    </header>
+
+    <main class="auth-container" id="main_auth">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1 class="auth-title">Welcome to Novelist Space</h1>
+                <p class="auth-subtitle">Your personal library of novels</p>
+            </div>
+
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Login</div>
+                <div class="auth-tab" data-tab="signup">Registration</div>
+            </div>
+
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" class="form-input" placeholder="Enter your username" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password" required>
+                </div>
+
+                <div id="loginError" class="error"></div>
+
+                <!-- Link to Forgot Password -->
+                <p class="forgot-password">
+                    <a href="/password_recovery/index.html">Forgotten Password?</a>
+                </p>
+                
+                <button type="submit" class="form-button">Login</button>
+                
+            </form>
+
+            <!-- Signup Form -->
+            <form class="auth-form" id="signupForm" method="POST">
+                <div class="form-group">
+                    <label class="form-label" for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" class="form-input" placeholder="Insert your E-Mail" required>
+                    <span class="error-message" id="emailError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="signupUsername">Username</label>
+                    <input type="text" id="signupUsername" class="form-input" placeholder="Choose a Username" required
+                        pattern="[a-zA-Z0-9_]{3,20}" title="3-20 charactres, only letters, numbers or underscore">
+                    <span class="error-message" id="usernameError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" class="form-input" placeholder="Create a Password" required>
+                    <p class="password-requirements">
+                        Password must be at least 8 characters long and include: </br>
+                        - At least one Capital letter </br>
+                        - At least one number</br>
+                        - At least one special character (@,$,!,%,*,?,&,_,-)
+                    </p>
+                    <span class="error-message" id="passwordError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm your password" required>
+                    <span class="error-message" id="confirmPasswordError"></span>
+                </div>
+
+                <div id="message2" class="error"></div>
+                <button type="submit" class="form-button">Create Account</button>
+            </form>
+        </div>
+    </main>
+
+    <main class="auth-container" id="main_success" hidden>
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1 class="auth-title">Novelist Space</h1>
+            </div>
+            
+            <form id="successForm">
+                <div class="expanding-div">
+                    <p id="success_message"></p>
+                </div>
+
+                <div class="container">
+                    <button type="submit" class="form-button">Return to login</button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <p id="p_footer"></p>
+    </footer>
+
+    <script src="/Scripts/index_login.js"></script>
+
+</body>
+</html>

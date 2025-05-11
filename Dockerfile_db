@@ -1,0 +1,22 @@
+FROM mysql:latest
+
+# Copy init files
+COPY config/*.sql /docker-entrypoint-initdb.d/
+
+# Copy SSL cert and key
+COPY ssl/ca.pem /etc/mysql/ssl/ca.pem
+COPY ssl/db/server-cert.pem /etc/mysql/ssl/server-cert.pem
+COPY ssl/db/server-key.pem /etc/mysql/ssl/server-key.pem
+
+# Set permissions
+RUN chown mysql:mysql -R /etc/mysql
+
+RUN chmod 644 /etc/mysql/ssl/server-cert.pem /etc/mysql/ssl/ca.pem && \
+    chmod 600 /etc/mysql/ssl/server-key.pem
+
+# Copy mysql config file
+COPY config/mysql.cnf /etc/mysql/conf.d/my.cnf
+
+EXPOSE 3306
+
+CMD ["mysqld"]
