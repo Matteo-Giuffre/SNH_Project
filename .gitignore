@@ -2,7 +2,7 @@
 secrets/smtp_*
 
 # Ignora i logs
-novelist_logs/*
+novelist_logs/*.log
 
 # Ignora dati admin
 config/03_insert_admin.sql
