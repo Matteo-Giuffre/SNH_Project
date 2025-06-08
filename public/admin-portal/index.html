@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Novelist Space - Login/Signup</title>
-    <link rel="stylesheet" href="../Styles/login_style.css">
+    <link rel="stylesheet" href="/Styles/login_style.css">
 </head>
 <body>
     <header class="header">
@@ -51,52 +51,11 @@
     </main>
 
     <footer class="footer">
-        <p>© 2025 Novelist Space. All rights reserved.</p>
+        <p id="p_footer"></p>
     </footer>
 
-    <script>
+    <script src="/Scripts/login_admin.js"></script>
 
-        // Validazione form di login
-        const loginForm = document.getElementById('loginForm');
-        
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-
-            //invio dati al backend php
-            fetch('be_login_admin.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json(); // Converte la risposta in JSON                      
-                } else {
-                    // Se il login fallisce, mostra un messaggio di errore
-                    throw new Error("Errore:risposta be_login_admin.php non valida");
-                }
-            })
-            .then(data => {
-                if (data.status == "success") {
-                    // Se la connessione è riuscita, reindirizza l'utente
-                    //sessionStorage.setItem('sessionActive', 'true');
-                    window.location.href = 'admin_panel.php';
-                } else {// se il db non è raggiungibile o le credenziali sono errate
-                    message.className = 'error';
-                    message.textContent = data.message;
-                }
-            })
-            .catch(error => {
-                console.error('Errore durante il login:', error);
-                document.getElementById('responseMessage').textContent = 'Errore: file login non disponibile.';
-            });
-
-        });
-    </script>
+    <script src="/Scripts/copyright.js"></script>
 </body>
 </html>

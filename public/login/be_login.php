@@ -5,9 +5,6 @@
         'cookie_secure' => true, 
         'cookie_samesite' => 'Strict'
     ]);
-
-    # Set json content type
-    header('Content-Type: application/json');
     
     // Clean undesired outputs
     ob_clean();
@@ -27,7 +24,7 @@
     // Initialize Sanitizer
     $sanitizer = new InputSanitizer();
 
-    # Validate username
+    // Validate username
     $username = $_POST['username'];
     if (!($username = $sanitizer->sanitizeUsername($username))) {
         http_response_code(400);
@@ -35,7 +32,7 @@
         exit; // Esci dallo script
     }
     
-    # Validate password
+    // Validate password
     $password = $_POST['password'];
     if (!$sanitizer->validatePassword($password)) {
         http_response_code(400);
@@ -45,27 +42,30 @@
 
     $query = "SELECT * FROM us3rs WHERE username = :username";
 
-    # Retrieve user info
+    // Retrieve user info
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(':username', $username);
     $stmt->execute();
-    $result = $stmt->fetch();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Se lo username non esiste o l'account non è ancora
-    if ($result === false || $result['complete'] === 0) {
+    // Se lo username non esiste o l'account non è ancora abilitato
+    if ($result === false || (int)$result['complete'] === 0) {
         http_response_code(403);
         echo json_encode(["status" => "error", 'message' => 'Wrong credentials or too many failed attempts']);
         exit;
     }
+    
+    $userid = $result['id'];
 
-    # If account is blocked, redirect user to password recovery (change password due to many failed attempts)
-    if ($result['locked'] === 1) {
+    // If account is locked, logs access attempt (change password due to many failed attempts)
+    if ((int)$result['locked'] === 1) {
+        logs_webapp("tried to access a locked account (user ID: $userid)", getClientIP(), 'login.log');
+
         http_response_code(403);
         echo json_encode(["status" => "error", "message" => "Wrong credentials or too many failed attempts"]);
         exit;
     }
 
-    $userid = $result['id'];
     $hashedPassword = $result['password'];
     if (password_verify($password, $hashedPassword)) {   //se anche la password è corretta allora il login viene eseguito con successo
 
@@ -80,10 +80,13 @@
         $_SESSION['loggedin'] = true;
         $_SESSION['id'] = $userid; // Salva l'id nella sessione
         $_SESSION['username'] = $username; // Salva lo username nella sessione
-        $_SESSION['user-type'] = ($result['ispremium'] === 0) ? "free" : "premium";  // ! Vedere se così non crea problemi con index.php
+        $_SESSION['user-type'] = ((int)$result['ispremium'] === 0) ? "free" : "premium";
         $_SESSION['IP'] = $_SERVER['REMOTE_ADDR']; // Per prevenire session hijacking
         $_SESSION['User-Agent'] = $_SERVER['HTTP_USER_AGENT']; // Per prevenire session hijacking
         $_SESSION['last_activity'] = time(); // Per timeout della sessione
+
+        // Logs access
+        logs_webapp('accessed the account', $username, 'login.log');
 
         http_response_code(200);
         echo json_encode(["status" => "success"]);
@@ -99,6 +102,9 @@
     $attempt_stmt->execute();
     $pdo->commit();
 
+    // Logs the failed attempt
+    logs_webapp("wrong credentials (user ID: $userid)", getClientIP(), 'login.log');
+
     // Se il numero di tentativi arriva a 5, blocco l'account e mando la mail
     if ($newAttemptCount >= 5) {
         $pdo->beginTransaction();
@@ -106,6 +112,9 @@
         $lock_stmt->bindParam(':userid', $userid);
         $lock_stmt->execute();
         $pdo->commit();
+
+        // Logs the account lock
+        logs_webapp('account locked', $username, 'login.log');
 
         $email = $result['email'];
 
@@ -129,10 +138,6 @@
                     null
                 );
             }
-        
-            http_response_code(403);
-            echo json_encode(["status" => "error", 'message' => 'Wrong credentials or too many failed attempts']);
-            exit;
 
         } catch (Exception $e) {
             http_response_code(500);

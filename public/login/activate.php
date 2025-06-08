@@ -1,5 +1,4 @@
 <?php
-    header('Content-Type: application/json');
     ob_clean();
 
     // Connessione al database

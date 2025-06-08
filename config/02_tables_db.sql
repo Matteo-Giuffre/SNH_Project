@@ -10,10 +10,12 @@ CREATE TABLE IF NOT EXISTS us3rs (
 );
 
 CREATE TABLE IF NOT EXISTS us3r_admin (
-    username VARCHAR(20) PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(20) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
-    salt CHAR(32) NOT NULL,
-    password CHAR(64) NOT NULL
+    password CHAR(255) NOT NULL, -- bcrypt spawn a 60 byte digest but in case default alg changes, we can leave space for each future algorithm
+    access_attempt INT DEFAULT 0,
+    locked BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS novels (

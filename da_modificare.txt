@@ -3,29 +3,6 @@ GENERAL
 - CROSS-SITE REQUEST FORGERY
 - CLICK JACKING -- OK 
 
-SIGNUP (admin)
-- HANDLING USER INPUT
-- LOGIN BRUTEFORCING
-- SECURE CREDENTIAL STORAGE
-- SQL INJECTION
-- TYPE JUGGLING
-- XSS
-- MANTAINING LOGS
-- USER ENUMERATION
-
-LOGIN (User and admin)
-- Se torno nel login e ho ancora la sessione aperta non devo rifare il login di nuovo. Abilitare il controllo di sessioni già esistenti (?)
-- HANDLING USER INPUT -- OK
-- LOGIN BRUTEFORCING -- OK
-- SECURE CREDENTIAL STORAGE -- OK
-- ACCESS CONTROL -- OK
-- SQL INJECTION -- OK
-- TYPE JUGGLING -- OK
-- XSS -- OK
-- COOKIES -- OK
-- USER ENUMERATION -- OK
-- MANTAINING LOGS
-
 PASSWORD RECOVERY
 - Togliere cartella style (ridondante)
 - HANDLING USER INPUT

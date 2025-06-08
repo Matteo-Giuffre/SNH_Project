@@ -1,2 +1,8 @@
 # Ignora i files SMTP nella cartella secrets
 secrets/smtp_*
+
+# Ignora i logs
+novelist_logs/*
+
+# Ignora dati admin
+config/03_insert_admin.sql

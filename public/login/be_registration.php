@@ -1,7 +1,4 @@
 <?php
-    # Set json content type
-    header('Content-Type: application/json');
-
     // Clean undesired outputs
     ob_clean();
 

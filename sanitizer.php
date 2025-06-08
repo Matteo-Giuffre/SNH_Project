@@ -3,7 +3,7 @@
 class InputSanitizer {
 
     public function sanitizeString($input): ?string {
-        if (!is_string($input)) return null;
+        if (!isset($input) || !is_string($input)) return null;
 
         // Remove tags, html char and string terminator
         $sanitezed = trim($input);
@@ -15,7 +15,7 @@ class InputSanitizer {
     }
     
     public function sanitizeEmail($input): ?string {
-        if (!is_string($input)) return null;
+        if (!isset($input) || !is_string($input)) return null;
 
         // Remove all string terminator and sanitize email
         $email = trim($input);
@@ -29,7 +29,7 @@ class InputSanitizer {
     }
 
     public function sanitizeUsername($input): ?string {
-        if (!is_string($input)) return null;
+        if (!isset($input) || !is_string($input)) return null;
 
         // Remove all tags and allow only safe char
         $username = trim($input);
@@ -43,6 +43,7 @@ class InputSanitizer {
     }
 
     public function validatePassword($password): bool {
+        if (!isset($password)) return false;
         // Check if password is a string and its length
         if (!is_string($password) || strlen($password) < 8) return false;
 

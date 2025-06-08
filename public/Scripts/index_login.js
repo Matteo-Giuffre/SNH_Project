@@ -64,11 +64,9 @@
         })
         .then(response => response.json())
         .then(data => {
-            console.log("Data type: ", typeof data);
-            console.log("Raw text: ", data);
             if (data.status == "success") {
                 // Se la connessione è riuscita, reindirizza l'utente
-                window.location.href = '../novels/index.php';
+                window.location.href = '/novels/index.php';
             } else {
                 // se il db non è raggiungibile o le credenziali sono errate
                 document.getElementById('loginError').innerHTML = data.message;

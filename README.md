@@ -14,6 +14,7 @@
 - **sanitizer.php**: come per il php dell'SMTP ho creato questa classe che sanitifica diversi tipi di input. NB: per la password non abbiamo bisogno di sanificare ma solamente di validare in quanto modifiche ad essa potrebbero causare problemi con l'hashing e cose varie
 - **ssl**: contiene tutti i certificati per la web application, per il db e la CA. Per abilitare la mutual authentication tra webapp e db, ho dovuto firmare i certificati del db e della webapp (per connettersi al db) con la stessa CA.
 - **config_db.php**: file per collegarsi al container che contiene il db
+- **03_insert_admin.sql**: inserire questo file dentro la directory "config" per inserire i dati dell'admin dopo la creazione delle tabelle sul DB
 
 ## Secrets:
 I secrets da creare sono:
