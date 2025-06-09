@@ -1,6 +1,9 @@
 <?php
     ob_clean();
 
+    // Set content type
+    header('Content-Type: application/json');
+
     // Connessione al database
     require_once '/var/www/mysql_client/config_db.php';
 

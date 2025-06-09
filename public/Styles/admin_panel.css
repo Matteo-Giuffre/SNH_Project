@@ -194,6 +194,11 @@ header h1 {
     transition: color 0.3s, text-decoration-color 0.3s, background-color 0.3s;
 }
 
+.logout-form {
+    float: right; 
+    margin-top: 10px;
+}
+
 /* Icona della porta d'uscita accanto al testo */
 .logout-icon {
     margin-right: 10px; /* Spazio tra l'icona e il testo */

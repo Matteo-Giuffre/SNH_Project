@@ -140,7 +140,7 @@
                     </path>
                 </svg>
                 <span class="logo-text">Novelist Space - Home</span>
-                <img src="Resources/user-icon.png" alt="User Icon" class="user-icon" id="user-icon" style="cursor: pointer;max-height: 40px;max-width: 40px; margin-left: 15px;">
+                <!-- <img src="/Resources/user-icon.png" alt="User Icon" class="user-icon" id="user-icon" style="cursor: pointer;max-height: 40px;max-width: 40px; margin-left: 15px;"> -->
                 <span class="user-info"><?php echo htmlspecialchars($username); ?></span>- 
                 <span class="account-status"><?php echo ucfirst(htmlspecialchars($user_type)); ?></span>
             </a>
@@ -149,7 +149,7 @@
             </div>
             <form action="logout.php" method="post" style="float: right; margin-top: 10px;">
                 <button type="submit" class="logout-button">
-                    <img src="../Resources/logout.png" alt="Logout Icon" class="logout-icon">
+                    <img src="/Resources/logout.png" alt="Logout Icon" class="logout-icon">
                     Log out
                 </button>
             </form>

@@ -8,6 +8,9 @@
 
     ob_clean();
 
+    // Set content type
+    header('Content-Type: application/json');
+
     if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
         header("Location: /admin-portal/");
         exit;

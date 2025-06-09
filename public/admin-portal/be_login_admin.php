@@ -9,6 +9,9 @@
     // Clean undesired outputs
     ob_clean();
 
+    // Set content type
+    header('Content-Type: application/json');
+
     require '/var/www/app/vendor/autoload.php';
 
     // Configurazione del database

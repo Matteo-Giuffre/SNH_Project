@@ -7,7 +7,7 @@
     ]);
 
     if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
-        header("Location: /admin-panel/");
+        header("Location: /admin-portal/");
         exit;
     }
 
@@ -15,7 +15,7 @@
     if ($_SESSION['IP'] !== $_SERVER['REMOTE_ADDR'] || $_SESSION['User-Agent'] !== $_SERVER['HTTP_USER_AGENT']) {
         session_unset();
         session_destroy();
-        header("Location: /admin-panel/");
+        header("Location: /admin-portal/");
         exit;
     }
 
@@ -23,7 +23,7 @@
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 900)) {
         session_unset();
         session_destroy();
-        header("Location: /admin-panel/");
+        header("Location: /admin-portal/");
         exit;
     }
     $_SESSION['last_activity'] = time(); // Aggiorna il timer
@@ -55,7 +55,7 @@
             </svg>
             <span class="logo-text">Novelist Space - Admin Panel</span>
         </a>
-        <form action="logout.php" method="post" style="float: right; margin-top: 10px;">
+        <form action="logout.php" method="post" class=".logout-form">
             <button type="submit" class="logout-button">
                 <img src="/Resources/logout.png" alt="Logout Icon" class="logout-icon">
                 Log out
@@ -80,7 +80,7 @@
                             </span>
                         </p>
                     </div>
-                    <button class="button button-toggle <?= $row['ispremium'] ? 'button-red' : '' ?>" onclick="togglePremium(<?= $row['id'] ?>)">
+                    <button class="button button-toggle <?= $row['ispremium'] ? 'button-red' : '' ?>" data-id="<?= $row['id'] ?>">
                         Switch to <?= $row['ispremium'] ? 'Free' : 'Premium' ?>
                     </button>
                 </div>
