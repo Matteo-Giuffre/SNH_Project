@@ -43,12 +43,21 @@ class InputSanitizer {
     }
 
     public function validatePassword($password): bool {
-        if (!isset($password)) return false;
+        if (!isset($password) || !is_string($password)) return false;
         // Check if password is a string and its length
         if (!is_string($password) || strlen($password) < 8) return false;
 
         // Check if password contains only allowed characters
         return preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,64}$/', $password);
+    }
+
+    public function validateResetToken($token): bool {
+        if (!isset($token) || !is_string($token)) {
+            return false;
+        }
+
+        // Controlla che sia lungo 64 caratteri ed esadecimale
+        return preg_match('/^[a-f0-9]{64}$/i', $token) === 1;
     }
 
     /**

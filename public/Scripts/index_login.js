@@ -1,6 +1,3 @@
-    const year = new Date().getFullYear();
-    document.getElementById("p_footer").innerHTML = "&copy " + year + " Novelist Space. All rights reserved.";
-            
     // Gestione del cambio tra login e signup
     document.addEventListener('DOMContentLoaded', function() {
         const tabs = document.querySelectorAll('.auth-tab');
@@ -77,7 +74,7 @@
         });
     });
 
-    // Validazione form di signup (AGGIUSTARE ULTIMA PARTE)
+    // Validazione form di signup
     const signupForm = document.getElementById('signupForm');
 
     signupForm.addEventListener('submit', function(e) {

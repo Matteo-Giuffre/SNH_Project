@@ -1,92 +1,112 @@
 <?php
-    require "/var/www/html/vendor/autoload.php";
+    ob_clean();
+    header('Content-Type: application/json');
 
-    use PHPMailer\PHPMailer\PHPMailer;
-    use PHPMailer\PHPMailer\Exception;
+    require "/var/www/app/vendor/autoload.php";
 
     // Configurazione del database
     require_once '/var/www/mysql_client/config_db.php';
 
+    // Configurazione del server SMTP
+    require_once '/var/www/smtp/smtp_connection.php';
+
+    // Sanitizer config and logging functions
+    require_once '/var/www/app/sanitizer.php';
+    require_once '/var/www/app/logger.php';
+
+    $sanitizer = new InputSanitizer();
+
     // Ricevi l'email dal POST
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
-        $email = trim($_POST['email']);
-
-        // Controlla se l'email è presente nel database
-        $query = "SELECT id,complete FROM us3rs WHERE email = :email";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':email', $email);
-        $stmt->execute();
-        $result = $stmt->fetch();
-
-        if ($result === false || $result['complete'] === 0) {
-            // Email non trovata, risposta generica
-            http_response_code(200);
-        } 
-        else {
-            // L'email esiste, genera un link unico
-            $userId = $result['id'];
-
-            // Elimina eventuali token precedenti per lo stesso utente
-            $deleteQuery = "DELETE FROM password_resets WHERE user_id = :user_id";
-            $deleteStmt = $pdo->prepare($deleteQuery);
-            $deleteStmt->bindParam(':user_id', $userId);
-            $deleteStmt->execute();
-
-            // Genera un nuovo token
-            $token = bin2hex(random_bytes(32)); // Token sicuro
-            $expiry = time() + 1800; // Scadenza in 30 minuti
-
-            // Salva il nuovo token nel database
-            $insertQuery = "INSERT INTO password_resets (user_id, email, token, expiry) VALUES (:user_id, :email, :token, :expiry)";
-            $insertStmt = $pdo->prepare($insertQuery);
-            $insertStmt->bindParam(':user_id', $userId);
-            $insertStmt->bindParam(':email', $email);
-            $insertStmt->bindParam(':token', $token);
-            $insertStmt->bindParam(':expiry', $expiry);
-            $insertStmt->execute();
-
-            // Crea il link di recupero con data di scadenza
-            $resetLink = "https://localhost/password_recovery/reset_password.php?token=$token";
-
-            // Leggi il contenuto del file mail.html
-            $mailContent = file_get_contents('./PHPMailer/email.html');
-            $mailContent = str_replace('{{resetLink}}', $resetLink, $mailContent);
-
-            // Configura PHPMailer
-            $mail = new PHPMailer(true);
-
-            try {
-                // Configura il server SMTP (es. Gmail)
-                $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com';
-                $mail->SMTPAuth = true;
-                $mail->Username = 'snh.project2425@gmail.com'; // Sostituisci con il tuo indirizzo Gmail
-                $mail->Password = 'fwji avvu qesu njpx'; // Sostituisci con la tua password per app
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port = 587;
-
-                // Impostazioni mittente e destinatario
-                $mail->setFrom('noreply@novelistspace.com', 'Novelist Space'); 
-                $mail->addAddress($email); // Destinatario
-
-                // Contenuto email
-                $mail->isHTML(true);
-                $mail->Subject = 'Password Recovery - Novelist Space';
-                $mail->Body = $mailContent;
-
-                // Invia l'email
-                $mail->send();
-                http_response_code(200); // Email inviata correttamente
-            } 
-            catch (Exception $e) {
-                // Gestione errori PHPMailer
-                error_log("Errore nell'invio dell'email: " . $mail->ErrorInfo);
-                http_response_code(500); // Errore nell'invio dell'email
-                exit;
-            }
-        }
-    } else {
-        http_response_code(400); // Richiesta non valida
+    if (!isset($_POST['email'])) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
         exit;
+    }
+    // Sanitize email
+    $email = $_POST['email'];
+    if (!($email = $sanitizer->sanitizeEmail($email))) {
+        logs_webapp("invalid format (email)", getClientIP(), "password_recovery.log");
+        http_response_code(400);
+        echo json_encode(["status" => "error", 'message' => 'Invalid mail']);
+        exit;
+    }
+
+    // Controlla se l'email è presente nel database
+    $query = "SELECT id, username, complete FROM us3rs WHERE email = :email";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':email', $email);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result === false || $result['complete'] === 0) {
+        // Email non trovata, risposta generica
+        logs_webapp("tried to recover the password with a non-existent email", getClientIP(), "password_recovery.log");
+        http_response_code(403);
+        echo json_encode(["status" => "error", "message" => "Something gone wrong. Try later"]);
+        exit;
+    }
+
+    // L'email esiste, genera un link unico
+    $userId = $result['id'];
+
+    // Elimina eventuali token precedenti per lo stesso utente
+    $deleteQuery = "DELETE FROM password_resets WHERE user_id = :user_id";
+    $deleteStmt = $pdo->prepare($deleteQuery);
+    $deleteStmt->bindParam(':user_id', $userId);
+    $deleteStmt->execute();
+
+    // Genera un nuovo token
+    $token = bin2hex(random_bytes(32)); // Token sicuro
+    $expiry = time() + 1800; // Scadenza in 30 minuti
+
+    // Salva il nuovo token nel database
+    $pdo->beginTransaction();
+    $insertQuery = "INSERT INTO password_resets (user_id, token, expiry) VALUES (:user_id, :token, :expiry)";
+    $insertStmt = $pdo->prepare($insertQuery);
+    $insertStmt->bindParam(':user_id', $userId);
+    $insertStmt->bindParam(':token', $token);
+    $insertStmt->bindParam(':expiry', $expiry);
+    $insertStmt->execute();
+
+    // Crea il link di recupero con data di scadenza
+    $resetLink = "https://localhost/password_recovery/reset_password.php?token=$token";
+
+    // Create the SMTP connection
+    $emailService = new EmailService();
+    
+    // SMTP variables
+    $subject = 'Password Recovery - Novelist Space';
+    $body = realpath('/var/www/smtp/recover_password.html');
+
+    try {
+
+        // Connection test
+        if ($emailService->testConnection()) {
+            
+            $emailService->sendEmail(
+                $email,
+                $subject, 
+                $body,
+                null,
+                $resetLink
+            );
+            
+            // If the registration was successful, commit to the DB
+            $pdo->commit();
+
+            // Write logs about registration
+            logs_webapp("requested password recovery for user $userId", getClientIP(), "password_recovery.log");
+
+            http_response_code(200);
+            echo json_encode(['status' => 'success']);
+            exit;
+        }
+
+    } catch (Exception $e) {
+        $pdo->rollback();
+        logs_webapp("email not sent to user $userId", getClientIP(), "password_recovery.log");
+        http_response_code(500);
+        // Gestione errori PHPMailer
+        echo json_encode(["status" => "error", 'message' => 'Something gone wrong. Try later']); 
     }
 ?>

@@ -3,15 +3,6 @@ GENERAL
 - CROSS-SITE REQUEST FORGERY
 - CLICK JACKING -- OK 
 
-PASSWORD RECOVERY
-- Togliere cartella style (ridondante)
-- HANDLING USER INPUT
-- SQL INJECTION
-- USER ENUMERATION
-- XSS
-- TYPE JUGGLING
-- MANTAINING LOGS
-
 NOVELS
 - Migliorare leggibilità
 - Vedere perché di default viene settato l'utente premium (index.php scambia gli utenti -- AGGIUSTARE TUTTO)
