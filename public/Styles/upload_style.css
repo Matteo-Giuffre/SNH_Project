@@ -105,6 +105,18 @@ select {
     margin-bottom: 0rem;
 }
 
+.message-error {
+    color: red; 
+    display: none; 
+    margin-top: 10px;
+}
+
+.message-ok {
+    color: green; 
+    display: none; 
+    margin-top: 10px;
+}
+
 .radio-group {
     display: flex;
     gap: 1.5rem;
@@ -144,8 +156,10 @@ select {
 }
 
 .preview-image {
-    width: 100%;
-    height: 200px;
+    /*width: 100%;
+    height: auto;*/
+    width: 50%;
+    height: auto;
     object-fit: cover;
     border-radius: 8px;
     margin-top: 1rem;
@@ -154,6 +168,26 @@ select {
 .preview-label {
     font-weight: bold;
     color: #888;
+}
+
+.preview-text {
+    display: none; 
+    margin-top: 2.5rem; 
+    max-height: 500px; 
+    max-width: 800px; 
+    overflow-y: auto; 
+    border: 3px solid #3b82f6; 
+    border-radius: 10px; 
+    padding: 10px; 
+    white-space: pre-wrap; 
+    scrollbar-width: auto; 
+    scrollbar-color:rgb(59, 59, 59) #2a2a2a;
+}
+
+.preview-pdf {
+    display: none; 
+    text-align: center; 
+    margin-top: 7rem;
 }
 
 @media (max-width: 768px) {
@@ -170,12 +204,30 @@ select {
     }
 }
 
-.custom-file-upload {
+.responsive-textarea {
     display: flex;
+    width: 100%;
+    color: #f5f5f5;
+    min-height: 80px;
+    padding: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+    border: 1px solid;
+    border-radius: 6px;
+    resize: vertical;
+    background: #333;
+}
+
+.custom-file-upload {
+    display: none;
     align-items: center;
     background: #333;
     border-radius: 5px;
     padding: 5px;
+}
+
+.clear-button {
+    display: none;
 }
 
 .file-display {
@@ -224,4 +276,11 @@ select {
 
 #back-home:hover {
     text-decoration: underline; /* Aggiunge la sottolineatura */
+}
+
+footer {
+    text-align: center;
+    padding: 1rem;
+    color: #666;
+    font-size: 0.9rem;
 }

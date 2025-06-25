@@ -35,6 +35,10 @@ RUN chown www-data:www-data -R /var/www/smtp
 RUN mkdir /var/www/novelist_logs && \
     chown www-data:www-data -R /var/www/novelist_logs/
 
+# Create uploaded_novels dir
+RUN mkdir /var/www/uploaded_novels && \
+    chown www-data:www-data -R /var/www/uploaded_novels/
+
 # Install PHP extensions and other dependencies
 RUN apt update && apt install -y \
     libzip-dev zip unzip &&  apt install -y openssl && \
@@ -66,5 +70,5 @@ EXPOSE 443
 # Set the working directory
 WORKDIR /var/www/html
 
-# Copy the current directory contents into the container at /usr/src/myapp
+# Copy the current directory contents into the container at /var/www/html
 COPY public/ /var/www/html

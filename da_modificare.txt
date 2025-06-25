@@ -1,20 +1,5 @@
 GENERAL
-- DIRECTORY BRUTEFORCE (dovrebbe essere risolta - provare un'altra scansione con gobuster)
-- CROSS-SITE REQUEST FORGERY
-- CLICK JACKING -- OK 
+- Aggiungere i log anche alle sanificazioni/validazioni (backend) che falliscono (?)
 
 NOVELS
-- Migliorare leggibilità
-- Vedere perché di default viene settato l'utente premium (index.php scambia gli utenti -- AGGIUSTARE TUTTO)
-- Una short novels deve essere inserita tramite testo in input (limitare i pdf solo alle long)
-- Una short novels può essere solo letta (non scaricata)
-- HANDLING USER INPUT (barra ricerca + inserimento novella)
 - MANTAINING LOGS (upload, delete, download, logout, scadenza session token)
-- PATH TRAVERSAL (novel details)
-- TOKEN/COOKIES
-- XSS
-- OS COMMAND INJECTION
-- DIRECTORY BRUTEFORCING (vedere se togliere la directory uploaded_novels e metterla esternamente alla public dir)
-- TYPE JUGGLING
-- SQL INJECTION
-- ACCESS CONTROL

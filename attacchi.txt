@@ -54,7 +54,7 @@ ON-SITE REQUEST FORGERY
 - Validare gli input
 
 CROSS-SITE REQUEST FORGERY
-- Utilizzare l'attributo SameSite nei cookies
+- Utilizzare l'attributo SameSite=strict nei cookies
 - Crea anti-CSRF token
 
 CLICKJACKING

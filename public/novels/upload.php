@@ -8,21 +8,21 @@
 
 
     if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-        header("Location: ../login/index.html");
+        header("Location: /login/");
         exit;
     }
 
     if ($_SESSION['IP'] !== $_SERVER['REMOTE_ADDR'] || $_SESSION['User-Agent'] !== $_SERVER['HTTP_USER_AGENT']) {
         session_unset();
         session_destroy();
-        header("Location: ../login/index.html");
+        header("Location: /login/");
         exit;
     }
 
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 900)) {//15 minuti
         session_unset();
         session_destroy();
-        header("Location: ../login/index.html");
+        header("Location: /login/");
         exit;
     }
     $_SESSION['last_activity'] = time(); // Aggiorna il timer
@@ -37,148 +37,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Novelist Space - Upload Your Novel</title>
         <link rel="stylesheet" href="/Styles/upload_style.css">
-        <script>
-            function updateFileInput() {
-                const shortOption = document.getElementById("short").checked;
-                const fileInput = document.getElementById("novel-file");
-                fileInput.value = "";
-                document.getElementById("file-name").value = "";
-                
-                if (shortOption) {
-                    fileInput.accept = ".txt";
-                } else {
-                    fileInput.accept = ".pdf";
-                }
-                clearFile();
-            }
-            
-            function displayPreview(event) {
-                const file = event.target.files[0];
-                if (!file) return;
-                document.getElementById("file-name").value = file.name;
-                document.getElementById("clear-file").style.display = "inline"; 
-                
-                const shortOption = document.getElementById("short").checked;
-                const previewContainer = document.getElementById("preview-container");
-                
-                if (shortOption && file.type === "text/plain") {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        document.getElementById("text-preview").innerText = e.target.result;
-                        document.getElementById("text-preview").style.display = "block";
-                        document.getElementById("pdf-preview").style.display = "none";
-                    };
-                    reader.readAsText(file);
-                } else {
-                    document.getElementById("text-preview").style.display = "none";
-                    document.getElementById("pdf-preview").style.display = "block";
-                    document.getElementById("pdf-preview-name").innerText = file.name;
-                }
-            }
-
-            function clearFile() {
-                document.getElementById("novel-file").value = "";
-                document.getElementById("file-name").value = "";
-                document.getElementById("clear-file").style.display = "none";
-                document.getElementById("text-preview").style.display = "none";
-                document.getElementById("pdf-preview").style.display = "none";
-            }
-            function updatePreview() {
-                document.getElementById("preview-title").innerText = document.getElementById("title").value || "";
-                document.getElementById("preview-author").innerText = document.getElementById("author").value || "";
-                document.getElementById("preview-genre").innerText = document.getElementById("genre").value || "Not set";
-                
-                const selectedOption = document.querySelector('input[name="option"]:checked').value;
-                document.getElementById("preview-option").innerText = selectedOption.charAt(0).toUpperCase() + selectedOption.slice(1);
-                const selectedType = document.querySelector('input[name="novel-type"]:checked').value;
-                document.getElementById("preview-type").innerText = selectedType.charAt(0).toUpperCase() + selectedType.slice(1);
-            }
-
-            document.addEventListener("DOMContentLoaded", function() {
-                document.getElementById("title").addEventListener("input", updatePreview);
-                document.getElementById("author").addEventListener("input", updatePreview);
-                document.getElementById("genre").addEventListener("change", updatePreview);
-                
-                const optionRadios = document.querySelectorAll('input[name="option"]');
-                optionRadios.forEach(radio => radio.addEventListener("change", updatePreview));
-
-                const TypeRadios = document.querySelectorAll('input[name="novel-type"]');
-                TypeRadios.forEach(radio => radio.addEventListener("change", updatePreview));
-            });
-
-            function validateForm(event) {
-                event.preventDefault(); // Previene l'invio del modulo se ci sono errori
-                document.getElementById("success-message").style.display = "none";
-                
-                let title = document.getElementById("title").value.trim();
-                let author = document.getElementById("author").value.trim();
-                let fileInput = document.getElementById("novel-file");
-                let errorMessage = document.getElementById("error-message");
-
-                if (title === "" || author === "" || fileInput.files.length === 0) {
-                    errorMessage.innerText = "Please fill in all fields!";
-                    errorMessage.style.display = "block";
-                } else {
-                    errorMessage.style.display = "none";
-                    uploadNovel(title,author,fileInput.files[0]);
-                }
-            }
-
-            function uploadNovel(title, author,file) {
-                let formData = new FormData();
-                formData.append("title", title);
-                formData.append("author", author);
-                formData.append("novel-file", file);
-
-                // Ottieni il valore del genere selezionato
-                let genre = document.getElementById("genre").value;
-                formData.append("genre", genre);
-
-                // Ottieni il valore di "option" (free o premium)
-                let option = 0; // 0 free - 1 premium
-                let optiontemp = document.querySelector('input[name="option"]:checked').value;
-                if (optiontemp === 'premium'){
-                    option = 1;
-                }
-                formData.append("free", option);
-
-                // Ottieni il valore di "novel-type" (short o long)
-                let novelType = 0; // 0 short - 1 long
-                let novelTypetemp = document.querySelector('input[name="novel-type"]:checked').value;
-                if (novelTypetemp === 'long'){
-                    novelType = 1;
-                }
-                formData.append("novel-type", novelType);
-
-                fetch("upload_novel.php", {
-                        method: "POST",
-                        body: formData
-                    })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        document.getElementById("error-message").innerText = data.error;
-                        document.getElementById("error-message").style.display = "block";
-                    } else {
-                        document.getElementById("success-message").innerText = data.message;
-                        document.getElementById("success-message").style.display = "block";
-                        clearFile();
-                        document.getElementById('title').value='';
-                        document.getElementById('author').value='';
-                        document.getElementById('genre').value='Fantasy';
-                        document.getElementById("preview-title").innerText = "";
-                        document.getElementById("preview-author").innerText = "";
-                        document.getElementById("preview-genre").innerText = "Fantasy";
-                    }
-                })
-                .catch(error => {
-                    console.error("Upload error:", error);
-                    document.getElementById("error-message").innerText = "Error uploading file. Try again later. " + error.message;
-                    document.getElementById("error-message").style.display = "block";
-                });
-            }
-            
-        </script>
     </head>
     <body>
         <header class="header">
@@ -283,11 +141,11 @@
                         <label>Select Novel Type</label>
                         <div class="radio-group">
                             <div class="radio-option">
-                                <input type="radio" id="short" name="novel-type" value="short" onchange="updateFileInput()" checked>
+                                <input type="radio" id="short" name="novel-type" value="short" checked>
                                 <label for="short">Short</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="long" name="novel-type" value="long" onchange="updateFileInput()">
+                                <input type="radio" id="long" name="novel-type" value="long">
                                 <label for="long">Long</label>
                             </div>
                         </div>
@@ -295,19 +153,22 @@
 
                     <div class="form-section">
                         <label>Upload File</label>
-                        <div class="custom-file-upload">
-                            <input type="file" id="novel-file" name="novel-file" accept=".pdf" onchange="displayPreview(event)" hidden>
+                        <div id="short-insert">
+                            <textarea id="short-novel-text" class="responsive-textarea" placeholder="Write your novel..."></textarea>
+                        </div>
+                        <div id="long-insert" class="custom-file-upload">
+                            <input type="file" id="novel-file" name="novel-file" accept=".pdf" hidden>
                             <div class="file-display">
                                 <input type="text2" id="file-name" placeholder="Choose file..." readonly>
-                                <button type="button" id="clear-file" onclick="clearFile()" style="display: none;">✖</button>
+                                <button type="button" id="clear-file" class="clear-button">✖</button>
                             </div>
-                            <button type="button" id="upload-btn" onclick="document.getElementById('novel-file').click();">Browse</button>
+                            <button type="button" id="upload-btn">Browse</button>
                         </div>
                     </div>
 
-                    <button type="submit" class="submit-btn" onclick="validateForm(event)">Upload Novel</button>
-                    <p id="error-message" style="color: red; display: none; margin-top: 10px;"></p>
-                    <p id="success-message" style="color: green; display: none; margin-top: 10px;"></p>
+                    <button type="submit" id="submit-novel" class="submit-btn">Upload Novel</button>
+                    <p id="error-message" class="message-error"></p>
+                    <p id="success-message" class="message-ok"></p>
                 </form>
             </div>
 
@@ -319,16 +180,24 @@
                     <p><span class="preview-label">Genre:</span> <span id="preview-genre">Not set</span></p>
                     <p><span class="preview-label">Option:</span> <span id="preview-option">Free</span></p>
                     <p><span class="preview-label">Novel Type:</span> <span id="preview-type">Short</span></p>
-                    <p><span class="preview-label">Uploaded by:</span> <span id="preview-username"><?php echo htmlspecialchars($username); ?></span></p>
+                    <p><span class="preview-label">Uploaded by:</span> <span id="preview-username"><?= htmlspecialchars($username, ENT_QUOTES) ?></span></p>
                 </div>
                 <div id="preview-container">
-                    <pre id="text-preview" style="display: none; margin-top: 2.5rem; max-height: 500px; max-width: 800px; overflow-y: auto; border: 3px solid #3b82f6; border-radius: 10px; padding: 10px; white-space: pre-wrap; scrollbar-width: auto; scrollbar-color:rgb(59, 59, 59) #2a2a2a;"></pre>
-                    <div id="pdf-preview" style="display: none; text-align: center; margin-top: 7rem;">
-                        <img src="Resources/pdf_icon.png" alt="PDF Preview" class="preview-image" style="width: 100px; height: auto;">
+                    <pre id="text-preview" class="preview-text"></pre>
+                    <div id="pdf-preview" class="preview-pdf">
+                        <img src="/Resources/pdf_icon.png" alt="PDF Preview" class="preview-image">
                         <p id="pdf-preview-name"></p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <footer class="footer">
+            <p id="p_footer"></p>
+        </footer>
+
+        <script src="/Scripts/copyright.js"></script>
+        <script src="/Scripts/upload_index.js"></script>
+
     </body>
 </html>

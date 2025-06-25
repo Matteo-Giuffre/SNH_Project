@@ -83,8 +83,8 @@ strong {
 
 /* Contenitore del testo della novella */
 .novel-content {
-    background: #fdfbf1;
-    color: #222;
+    background: #333;
+    color: #f5f5f5;
     padding: 15px;
     border-radius: 5px;
     border: 2px solid #e0d8c3;

@@ -7,8 +7,7 @@ class InputSanitizer {
 
         // Remove tags, html char and string terminator
         $sanitezed = trim($input);
-        $sanitezed = strip_tags($input);
-        $sanitezed = htmlspecialchars($sanitezed, ENT_QUOTES, 'UTF-8');
+        $sanitezed = strip_tags($sanitezed);
         $sanitezed = str_replace("\0", "", $sanitezed);
 
         return $sanitezed;
@@ -60,17 +59,16 @@ class InputSanitizer {
         return preg_match('/^[a-f0-9]{64}$/i', $token) === 1;
     }
 
-    /**
-     * Genera un token anti-CSRF da salvare in sessione
-     */
-    public function generateCSRFToken(): string {
-        return bin2hex(random_bytes(32));
-    }
+    public function sanitizeMultiLineString($input): ?string {
+        if (!isset($input) || !is_string($input)) return null;
 
-    /**
-     * Valida un token CSRF fornito rispetto a quello salvato
-     */
-    public function validateCSRFToken(string $token, string $sessionToken): bool {
-        return hash_equals($sessionToken, $token);
+        // Remove tags, html char and string terminator
+        $sanitezed = trim($input);
+        $sanitezed = strip_tags($sanitezed);
+        $sanitezed = str_replace("\0", "", $sanitezed);
+
+        // Convert newline in unix format
+        $sanitezed = str_replace(["\r\n", "\r"], "\n", $sanitezed);
+        return $sanitezed;
     }
 }

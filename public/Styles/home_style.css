@@ -21,6 +21,13 @@
     font-weight: bold;
 }
 
+.logo .user-icon {
+    width: 40px; 
+    height: 40px;
+    margin-left: 15px;
+    object-fit: contain;
+}
+
 .user-info {
     /*margin-left: 5px;*/
     font-size: 1.3rem;
@@ -132,6 +139,12 @@ h2 {
     /*margin-left: 2.5rem;*/
 }
 
+.filter-title {
+    padding-left: 2.2rem; 
+    padding-bottom: 0rem; 
+    font-size: 1.5rem;
+}
+
 .filter-tag {
     background-color: #333;
     color: white; /* Testo bianco per contrasto */
@@ -191,6 +204,11 @@ footer {
     transition: color 0.3s, text-decoration-color 0.3s, background-color 0.3s;
 }
 
+.logout-form {
+    float: right; 
+    margin-top: 10px;
+}
+
 /* Icona della porta d'uscita accanto al testo */
 .logout-icon {
     margin-right: 10px; /* Spazio tra l'icona e il testo */
@@ -206,13 +224,13 @@ footer {
 
 .novels-container {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 colonne */
-    gap: 20px; /* Spaziatura tra le card */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Auto-adattamento */
+    gap: 20px;
     padding: 20px;
-    justify-content: center;
-    max-width: 1200px;
+    max-width: 1400px; /* Aumentato leggermente */
     margin: 0 auto;
     margin-top: 6px;
+    justify-items: center; /* Centra le card nella griglia */
 }
 
 .novel-card {
@@ -226,11 +244,17 @@ footer {
     color: black;
     padding: 15px;
     height: 250px;
-    width: 335px;
-    margin-top: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-bottom: 0px;
+    width: 100%; /* Usa tutta la larghezza disponibile */
+    max-width: 320px; /* Limita la larghezza massima */
+    min-width: 280px; /* Larghezza minima per evitare card troppo strette */
+    margin: 0; /* Rimuovi i margini esterni */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Aggiungi transizione per hover */
+}
+
+/* Effetto hover per le card */
+.novel-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 /* Titolo con riga sotto */
@@ -275,19 +299,55 @@ footer {
 
 .details-button {
     display: flex;
-    margin-top: 10px;
+    margin-top: auto; /* Spingi il pulsante in basso */
     background: #2196F3;
     color: white;
-    padding: 8px 8px;
+    padding: 10px 16px;
     text-align: center;
     border: 0px;
     border-radius: 5px;
-    width: 140px;
     text-decoration: none;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
-    margin-left: 82px;
+    align-self: center; /* Centra il pulsante */
+    min-width: 120px;
+    transition: background-color 0.2s ease;
+}
+
+/* Media queries per responsive design */
+@media (max-width: 1200px) {
+    .novels-container {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 18px;
+        padding: 18px;
+    }
+}
+
+@media (max-width: 768px) {
+    .novels-container {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .novel-card {
+        min-width: 250px;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .novels-container {
+        grid-template-columns: 1fr; /* Una sola colonna su schermi molto piccoli */
+        gap: 15px;
+        padding: 10px;
+    }
+    
+    .novel-card {
+        min-width: auto;
+        max-width: 100%;
+    }
 }
 
 .details-button:hover {

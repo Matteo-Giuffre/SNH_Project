@@ -32,7 +32,7 @@ services:
     depends_on:
       - db
     volumes:
-      - novels_volume:/var/www/html/novels/uploaded_novels:rw
+      - novels_volume:/var/www/uploaded_novels:rw
       - ./novelist_logs:/var/www/novelist_logs:rw
     secrets:
       - source: mysql_password
