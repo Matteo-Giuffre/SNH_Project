@@ -27,21 +27,26 @@
         exit;
     }
     $_SESSION['last_activity'] = time(); // Aggiorna il timer
+    
+    // Configurazione del database
+    require_once '/var/www/mysql_client/config_db.php';
+    require_once '/var/www/app/logger.php';
 
     $user_id = $_SESSION['id'];
     $user_type = $_SESSION['user-type'];
 
     if (!isset($_GET['id'])) {
+        logs_webapp("bad request (novel ID missing)", $_SESSION['username'], 'novels.log');
+
         http_response_code(404);
         echo json_encode(['status' => 'error', 'message' => 'Novel not found']);
         exit;
     }
 
-    // Configurazione del database
-    require_once '/var/www/mysql_client/config_db.php';
-
     $novel_id = intval($_GET['id']); // Assicuriamoci che sia un intero
     if (!is_int($novel_id)) {
+        logs_webapp("used an invalid id format", $_SESSION['username'], 'novels.log');
+
         http_response_code(400);
         echo json_encode(["status" => "error", "message" => "Invalid id format"]);
         exit;
@@ -56,6 +61,8 @@
     $novel = $stmt->fetch(PDO::FETCH_ASSOC); // Ottieni i dati come array associativo
 
     if (!$novel) {
+        logs_webapp("searched for a non-existent novel (novel not found in DB)", $_SESSION['username'], 'novels.log');
+
         http_response_code(404);
         echo json_encode(["status" => "error", "message" => "Novel not found"]);
         exit;
@@ -63,6 +70,8 @@
 
     // Se la novella è premium e l'utente non lo è (e non è neanche l'uploader) blocca la richiesta
     if (($novel['free'] && $user_type !== 'premium') && $novel['uploader_id'] !== $user_id) {
+        logs_webapp("tried to access a novel without right priviledges (novel ID: $novel_id)", $_SESSION['username'], 'novels.log');
+        
         http_response_code(401);
         echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
         exit;
@@ -72,9 +81,13 @@
     $filePath = $novel['file_path']; 
 
     if (!file_exists($filePath)) {
+        logs_webapp("searched for a non-existent novel (file not found - novel ID: $novel_id)", $_SESSION['username'], 'novels.log');
+        
         http_response_code(404);
         die("Server Error: File not Found");
     }
+
+    logs_webapp("opened a novel (novel ID: $novel_id)", $_SESSION['username'], 'novels.log');
 ?>
 
 <!DOCTYPE html>

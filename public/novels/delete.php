@@ -31,8 +31,11 @@
 
     //Configurazione db
     require_once '/var/www/mysql_client/config_db.php';
+    require_once '/var/www/app/logger.php';
 
     if (!isset($_POST['novel_id'])) {
+        logs_webapp('bad request (novel ID missing)', $_SESSION['username'], 'novels.log');
+
         http_response_code(400);
         echo json_encode(["status" => "error", "message" => "Invalid novel ID"]);
         exit;
@@ -49,6 +52,8 @@
     $novel = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$novel) {
+        logs_webapp("novel not found in DB (novel ID: $novel_id)", $_SESSION['username'], 'novels.log');
+
         http_response_code(404);
         echo json_encode(["status" => "error", "message" => "Novel not found"]);
         exit;
@@ -62,8 +67,18 @@
 
     // Elimina la novella dal database
     $stmt = $pdo->prepare("DELETE FROM novels WHERE id = :id");
-    $stmt->execute(['id' => $novel_id]);
+    $stmt->bindParam(':id', $novel_id);
+    
+    if ($stmt->execute()) {
+        logs_webapp("deleted a novel (novel ID: $novel_id)", $_SESSION['username'], 'novels.log');
 
-    http_response_code(200);
-    echo json_encode(["status" => "success", "message" => "Novel deleted successfully"]);
+        http_response_code(200);
+        echo json_encode(["status" => "success", "message" => "Novel deleted successfully"]);
+        exit;
+    }
+
+    logs_webapp("something gone wrong while deleting the novel (novel ID: $novel_id)", $_SESSION['username'], 'novels.log');
+
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'Something gone wrong while deleting the novel']);
 ?>

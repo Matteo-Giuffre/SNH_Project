@@ -12,6 +12,9 @@
 
     // Verifica se è stato passato il token tramite la query string
     if (!isset($_GET['token']) || empty($_GET['token'])) {
+        logs_webapp("token missing or invalid token used", getClientIP(), "registration.log");
+
+        http_response_code(400);
         echo json_encode(["status" => "error", "message" => "Missing Token!"]);
         exit;
     }
@@ -27,6 +30,8 @@
     $activation = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$activation) {
+        logs_webapp("invalid token (not found in DB)", getClientIP(), "registration.log");
+
         http_response_code(498);
         // Token non trovato
         echo json_encode(["status" => "error", "message" => "Invalid Token!"]);
@@ -38,6 +43,8 @@
     $expiryTime = new DateTime($activation['expiry']);
 
     if ($currentTime > $expiryTime) {
+        logs_webapp("used an expired token", getClientIP(), "registration.log");
+
         http_response_code(498);
         // Il token è scaduto
         echo json_encode(["status" => "error", "message" => "Expired Token."]);
@@ -69,6 +76,8 @@
         exit;
 
     } else {
+        logs_webapp("something gone wrong during account activation", $activation['username'], "registration.log");
+
         $pdo->rollback();
         http_response_code(500);
         echo json_encode(["status" => "error", "message" => "Error during account activation."]);

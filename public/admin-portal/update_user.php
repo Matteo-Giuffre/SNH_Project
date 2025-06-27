@@ -65,6 +65,8 @@
         exit;
 
     }
+    logs_webapp("bad request (user ID missing)", 'Admin (ID: ' . $_SESSION['admin_id']. ')', 'admin_panel.log');
+
     http_response_code(400);
     echo json_encode(["status" => "error", "message" => "Invalid parameter"]);
 ?>

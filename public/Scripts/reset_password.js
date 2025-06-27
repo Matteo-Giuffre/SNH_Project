@@ -6,7 +6,7 @@
         PasswordError.innerHTML = '';
 
         const password = document.getElementById('newpassword').value.trim();
-        if (!password.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,64}$/)) {
+        if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{}\[\]|;:\'",.<>?\\/`~]).{8,64}$/)) {
             PasswordError.innerHTML = 'Invalid Password';
             return;
         }

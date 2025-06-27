@@ -27,48 +27,61 @@
         exit;
     }
 
+    $_SESSION['last_activity'] = time(); // Aggiorna il timer
+    $basedir = realpath('/var/www/uploaded_novels/');
+    $user_id = $_SESSION['id']; // Ottieni l'id dalla sessione
+    
+    // Configurazione del database
+    require_once '/var/www/mysql_client/config_db.php';
+    require_once '/var/www/app/sanitizer.php';
+    require_once '/var/www/app/logger.php';
+    
     if (!isset($_POST['author'], $_POST['title'], $_POST['genre'], $_POST['free'], $_POST['novel-type'])) {
+        logs_webapp("bad request (parameters missing)", $_SESSION['username'], 'novels_upload.log');
+
         http_response_code(400);
         echo json_encode(["status" => "error", "message" => "Missing required parameters"]);
         exit;
     }
 
-    $_SESSION['last_activity'] = time(); // Aggiorna il timer
-    $basedir = realpath('/var/www/uploaded_novels/');
-    $user_id = $_SESSION['id']; // Ottieni l'id dalla sessione
-
-    // Configurazione del database
-    require_once '/var/www/mysql_client/config_db.php';
-    require_once '/var/www/app/sanitizer.php';
-
     $sanitizer = new InputSanitizer();
 
     $title = $_POST['title'];
     if (!($title = $sanitizer->sanitizeString($title))) {
+        logs_webapp('tried to use an invalid title format', $_SESSION['username'], 'novels_upload.log');
+
         http_response_code(400);
         echo json_encode(["status" => "error", "message", "Invalid title format"]);
         exit;
     }
     $author = $_POST['author'];
     if (!($author = $sanitizer->sanitizeString($author))) {
+        logs_webapp('tried to use an invalid author format', $_SESSION['username'], 'novels_upload.log');
+
         http_response_code(400);
         echo json_encode(["status" => "error", "message", "Invalid author format"]);
         exit;
     }
     $genre = $_POST['genre'];
     if (!($genre = $sanitizer->sanitizeString($genre))) {
+        logs_webapp('tried to use an invalid genre format', $_SESSION['username'], 'novels_upload.log');
+
         http_response_code(400);
         echo json_encode(["status" => "error", "message", "Invalid genre format"]);
         exit;
     }
     $free = (int)$_POST['free'];
     if ($free !== 0 && $free !== 1) {
+        logs_webapp('tried to use an invalid priviledge format', $_SESSION['username'], 'novels_upload.log');
+
         http_response_code(400);
-        echo json_encode(["status" => "error", "message", "Invalid availability format"]);
+        echo json_encode(["status" => "error", "message", "Invalid priviledge format"]);
         exit;
     }
     $novelType = (int)$_POST['novel-type'];
     if ($novelType !== 0 && $novelType !== 1) {
+        logs_webapp('tried to use an invalid novel type format', $_SESSION['username'], 'novels_upload.log');
+
         http_response_code(400);
         echo json_encode(["status" => "error", "message", "Invalid novel type format"]);
         exit;
@@ -77,6 +90,8 @@
     // Check short novel
     if ($novelType === 0) {
         if (!isset($_POST['novel-text']) || empty($_POST['novel-text'])) {
+            logs_webapp('missing text to upload a short novel', $_SESSION['username'], 'novels_upload.log');
+
             http_response_code(400);
             echo json_encode(['status' => 'error', 'message' => 'Short novel text is required.']);
             exit;
@@ -85,6 +100,8 @@
         // Sanitize novel text
         $short_novel = $_POST['novel-text'];
         if (!($short_novel = $sanitizer->sanitizeMultiLineString($short_novel))) {
+            logs_webapp('tried to use an invalid novel text format', $_SESSION['username'], 'novels_upload.log');
+
             http_response_code(400);
             echo json_encode(["status" => "error", "message" => "Invalid short novel format"]);
             exit;
@@ -99,6 +116,8 @@
         $result = file_put_contents($targetFile, $short_novel);
 
         if ($result === false) {
+            logs_webapp('something gone wrong during novel uploading ', $_SESSION['username'], 'novels_upload.log');
+
             http_response_code(500);
             echo json_encode(["status" => "error", "message" => "Something gone wrong during novel uploading!"]);
             exit;
@@ -122,6 +141,9 @@
             
             // Esegui l'inserimento
             if ($stmt->execute()) {
+                $last_id = $pdo->lastInsertId();
+                logs_webapp("uploaded a short novel (novel ID: $last_id)", $_SESSION['username'], 'novels_upload.log');
+
                 http_response_code(200);
                 echo json_encode(["status" => "success", "message" => "Novel uploaded successfully"]);
                 exit;
@@ -131,6 +153,8 @@
             throw new PDOException("Something gone wrong during novel uploading!");
 
         } catch (PDOException $e) {
+            logs_webapp("tried to insert a short novel but something gone wrong", $_SESSION['username'], 'novels_upload.log');
+
             // If something gone wrong delete the uploaded file
             if (file_exists($targetFile)) {
                 unlink($targetFile);
@@ -144,6 +168,8 @@
     // Check long novel
     if ($novelType === 1) {
         if (!isset($_FILES['novel-file']) || $_FILES['novel-file']['error'] !== UPLOAD_ERR_OK) {
+            logs_webapp('tried to use an invalid file format (only PDF are valid)', $_SESSION['username'], 'novels_upload.log');
+
             http_response_code(400);
             echo json_encode(['status' => 'error', 'message' => 'Valid PDF file is required for long novel.']);
             exit;
@@ -152,6 +178,8 @@
         // Check file extension
         $fileExtension = strtolower(pathinfo($_FILES['novel-file']['name'], PATHINFO_EXTENSION));
         if ($fileExtension !== "pdf") {
+            logs_webapp('tried to use an invalid file format (only PDF are valid)', $_SESSION['username'], 'novels_upload.log');
+
             http_response_code(400);
             echo json_encode(['status' => 'error', 'message' => 'Invalid file type. Only PDF files are allowed.']);
             exit;
@@ -164,6 +192,8 @@
         finfo_close($finfo);
 
         if ($mimeType !== 'application/pdf') {
+            logs_webapp('tried to use an invalid file format (only PDF are valid)', $_SESSION['username'], 'novels_upload.log');
+
             http_response_code(400);
             echo json_encode(['status' => 'error', 'message' => 'Invalid file type. Only PDF files are allowed.']);
             exit;
@@ -195,6 +225,11 @@
                 
                 // Esegui l'inserimento
                 if ($stmt->execute()) {
+                    // Retrieve last id and log the event
+                    $last_id = $pdo->lastInsertId();
+                    logs_webapp("uploaded a long novel (novel ID: $last_id)", $_SESSION['username'], 'novels_upload.log');
+                    
+                    // Send success response
                     http_response_code(200);
                     echo json_encode(["status" => "success", "message" => "Novel uploaded successfully"]);
                     exit;
@@ -203,6 +238,8 @@
                 throw new PDOException("Something gone wrong during novel uploading!");
 
             } catch (PDOException $e) {
+                logs_webapp("tried to insert a long novel but something gone wrong", $_SESSION['username'], 'novels_upload.log');
+
                 // If something gone wrong delete the uploaded file
                 if (file_exists($targetFile)) {
                     unlink($targetFile);
@@ -214,6 +251,8 @@
             }
         }
 
+        logs_webapp('something gone wrong during novel uploading ', $_SESSION['username'], 'novels_upload.log');
+        
         http_response_code(500);
         echo json_encode(["status" => "error", "message" => "Something gone wrong during novel uploading!"]);
     }

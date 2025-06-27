@@ -44,10 +44,10 @@ class InputSanitizer {
     public function validatePassword($password): bool {
         if (!isset($password) || !is_string($password)) return false;
         // Check if password is a string and its length
-        if (!is_string($password) || strlen($password) < 8) return false;
+        if (strlen($password) < 8) return false;
 
         // Check if password contains only allowed characters
-        return preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,64}$/', $password);
+        return preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{}\[\]|;:\'",.<>?\\/`~]).{8,64}$/', $password);
     }
 
     public function validateResetToken($token): bool {

@@ -46,11 +46,6 @@ services:
       - source: smtp_password
         target: /run/www-data_secrets/smtp_password
     user: "www-data"
-    develop:
-      watch:
-        - action: rebuild
-          path: .
-          target: /var/www
     networks:
       - novelist_net
 

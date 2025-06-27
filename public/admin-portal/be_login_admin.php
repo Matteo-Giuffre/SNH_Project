@@ -29,6 +29,8 @@
     // Validate username
     $username = $_POST['username'];
     if (!($username = $sanitizer->sanitizeUsername($username))) {
+        logs_webapp("tried to use an invalid username format", getClientIP(), 'admin_login.log');
+        
         http_response_code(400);
         echo json_encode(["status" => "error", 'message' => 'Invalid username']);
         exit; // Esci dallo script
@@ -37,6 +39,8 @@
     // Validate password
     $password = $_POST['password'];
     if (!$sanitizer->validatePassword($password)) {
+        logs_webapp("tried to use an invalid password format", getClientIP(), 'admin_login.log');
+
         http_response_code(400);
         echo json_encode(["status" => "error", 'message' => 'Invalid password']);
         exit; // Esci dallo script
@@ -88,7 +92,7 @@
         $_SESSION['last_activity'] = time(); // Per timeout della sessione
 
         // Logs successful login
-        logs_webapp("accessed the account", "$username (ID: $userid)", 'admin_login.log');
+        logs_webapp("accessed the account", "Admin (ID: $userid)", 'admin_login.log');
 
         http_response_code(200);
         echo json_encode(["status" => "success", "message" => "Success login"]);
@@ -117,7 +121,7 @@
         $pdo->commit();
 
         // Logs the account lock
-        logs_webapp('account locked', $username, 'admin_login.log');
+        logs_webapp("account locked for admin (ID: $userid)", getClientIP(), 'admin_login.log');
 
         $email = $result['email'];
 
@@ -149,6 +153,7 @@
             exit;
         }
     }
+
     http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'Wrong credentials']);
     exit;

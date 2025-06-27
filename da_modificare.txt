@@ -1,5 +1,0 @@
-GENERAL
-- Aggiungere i log anche alle sanificazioni/validazioni (backend) che falliscono (?)
-
-NOVELS
-- MANTAINING LOGS (upload, delete, download, logout, scadenza session token)

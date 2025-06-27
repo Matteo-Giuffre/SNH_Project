@@ -6,12 +6,12 @@ loginForm.addEventListener('submit', function(e) {
     
     const username = document.getElementById('loginUsername').value.trim();
     if (!username.match(/^[a-zA-Z0-9_-]{3,20}$/)) {
-            return;
+        return;
     }
 
     const password = document.getElementById('loginPassword').value.trim();
-    if (!password.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,64}$/)) {
-            return;
+    if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{}\[\]|;:\'",.<>?\\/`~]).{8,64}$/)) {
+        return;
     }
 
     //invio dati al backend php

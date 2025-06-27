@@ -23,6 +23,8 @@
     // Sanitize username
     $username = $_POST['username']; 
     if (!($username = $sanitizer->sanitizeUsername($username))) {
+        logs_webapp('tried to use an invalid username format', getClientIP(), 'registration.log');
+
         http_response_code(400);
         echo json_encode(["status" => "error", "message" => "Invalid username"]);
         exit;
@@ -36,6 +38,8 @@
     $checkStmt->execute();
 
     if ($checkStmt->fetchColumn() > 0) {
+        logs_webapp('tried to register using an existing username', getClientIP(), 'registration.log');
+
         http_response_code(409);
         // Username già utilizzati
         echo json_encode(["status" => "error", 'message' => 'Username already exists']);
@@ -45,6 +49,8 @@
     // Sanitize email
     $email = $_POST['email'];
     if (!($email = $sanitizer->sanitizeEmail($email))) {
+        logs_webapp('tried to use an invalid email format', getClientIP(), 'registration.log');
+        
         http_response_code(400);
         echo json_encode(["status" => "error", 'message' => 'Invalid mail']);
         exit;
@@ -53,8 +59,11 @@
     // Validate password
     $password = trim($_POST['password']);
     if (!$sanitizer->validatePassword($password)) {
+        logs_webapp('tried to use an invalid password format', getClientIP(), 'registration.log');
+        
         http_response_code(400);
         echo json_encode(["status" => "error", "message" => "Invalid password"]);
+        exit;
     }
 
     // Controllo se l'username o l'email esistono già nel database
@@ -168,14 +177,24 @@
         
             } catch (Exception $e) {
                 $pdo->rollback();
+                logs_webapp("something gone wrong during registration (email sending)", $username, 'registration.log');
+
                 http_response_code(500);
                 // Gestione errori PHPMailer
                 echo json_encode(["status" => "error", 'message' => 'Something gone wrong during registration']); 
                 exit;
             }
         }
+
+        logs_webapp("something gone wrong during registration (token creation)", getClientIP(), 'registration.log');
+
         http_response_code(500);
         echo json_encode(['status' => 'error', 'message' => 'Something gone wrong during registration']);
         exit;
     }
+
+    logs_webapp("something gone wrong during registration (account creation)", getClientIP(), 'registration.log');
+
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'Something gone wrong during registration']);
 ?>

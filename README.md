@@ -1,36 +1,67 @@
 # System and Network Hacking Project
 
-## Spiegazione files e directories
-- **Dockerfile_db**: dockerfile che costruisce il db. Attualmente il database è settato in modo da richiedere la mutual authentication (quindi con verifica del certificato) da parte dell'utente "novelist_user" (vedere ./config/ssl_init.sql)
-- **Dockerfile_web**: si occupa della costruzione di tutte le directory necessarie per il corretto funzionamento della web application. I files e directories che verranno create sono specificate qui dentro. In caso doveste creare altre directory, date i giusti permessi runnando un `chown www-data:www-data -R /path/nuova/cartella`
-- **docker-compose**: il solito docker-compose. Da qui la web application viene lanciata con l'utente **www-data** ed ho settato la modalità **watch** in modo che ad ogni modifica il container viene ricostruito per evitare di rilanciare il comando (meglio verificare però che le modifiche vengano effettivamente fatte, in quanto a volte non succede)
-- **config**: qui dentro ci sono i file di configurazione. **Importante**: per prevenire alcuni attacchi (es. clickjacking) bisogna settare alcuni header; anziché settarli in ogni file php è possibile inseririli dentro **apache-ssl.conf** in modo che il server ad ogni risposta inserisca questi header per prevenire gli attacchi.
-- **config/tables_db.sql**: in questa tabella ho tolto il salt agli utenti dato che utilizzeremo bcrypt (il salt e la password hashata sono direttamente in un'unica stringa quindi non c'è bisogno di due colonne diverse ma ne basta una)
-- **novelist_logs**: è la cartella in cui verranno salvati i logs. Non cambiate nome in quanto se inserite solo log, linux la rileva automaticamente come cartella appartenente al root e l'utente www-data (che runna tutta l'applicazione) non sarà in grado di scriverci sopra
-- **public**: contiene tutti i file necessari per la web application
-- **secrets**: questa cartella contiene tutte le password e informazioni sensibili per l'applicazione (i file non li carico ma leggete sotto per capire quali bisogna creare)
-- **smtp_config**: ha un file php per connettersi direttamente al server SMTP. Ho pensato che è meglio avere un unico file da richiamare anziché scrivere tutta la procedura in ogni file php e incappare in errori (almeno essendo unico e funzionante sappiamo che funziona). Inoltre contiene tutti i file html che verranno inviati tramite email
-- **logger.php**: questo file serve per scrivere i logs
-- **sanitizer.php**: come per il php dell'SMTP ho creato questa classe che sanitifica diversi tipi di input. NB: per la password non abbiamo bisogno di sanificare ma solamente di validare in quanto modifiche ad essa potrebbero causare problemi con l'hashing e cose varie
-- **ssl**: contiene tutti i certificati per la web application, per il db e la CA. Per abilitare la mutual authentication tra webapp e db, ho dovuto firmare i certificati del db e della webapp (per connettersi al db) con la stessa CA.
-- **config_db.php**: file per collegarsi al container che contiene il db
-- **03_insert_admin.sql**: inserire questo file dentro la directory "config" per inserire i dati dell'admin dopo la creazione delle tabelle sul DB
+## Getting started
+### Inserimento secrets
+Per abilitare l'invio delle emails, bisogna fornire le credenziali del server SMTP a cui connettersi. Queste info sono caricate tramite i seguenti secrets:
+- `secrets/smtp_host.txt`: hostname del server SMTP per l'autenticazione (es. *smtp.gmail.com*).
+- `secrets/smtp_port.txt`
+- `secrets/smtp_username.txt`: indirizzo email utilizzato per inviare i messaggi.
+- `secrets/smtp_password.txt`
 
-## Secrets:
-I secrets da creare sono:
-- **mysql_password.txt**: la password per l'utente mysql (libera scelta)
-- **mysql_root_password.txt**: la password per l'utente root mysql (libera scelta)
-- **smtp_host.txt**: il server SMTP a cui collegarsi
-- **smtp_port.txt**: la porta SMTP a cui collegarsi
-- **smtp_username.txt**: l'indirizzo email a cui collegarsi
-- **smtp_password.txt**: la password dell'indirizzo email da utilizzare per collegarsi al server SMTP (es. password Gmail)
+### Inserimento indirizzo email dell'admin
+Per registrare correttamente l'admin della web application, è necessario inserire un indirizzo email valido nel file `config/03_insert_admin.sql`.
 
-## SMTP
-Ho provato ad utilizzare l'account Gmail che aveva creato Matteo ma a volte funzionava altre no. Quando avevamo iniziato il progetto avevo preso un dominio a 0€ (novelistspace.it). Questo dominio include un file SMTP con 50 mail giornaliere disponibili. Evito di pubblicare host, port, username e password in quanto ci sono i miei dati come carta di credito ecc. 
-**Se volete utilizzarlo contattatemi che vi giro le credenziali in privato.**
+### Build containers
+Per costruire il database e l'applicazione, eseguire il comando:
+```bash
+   docker compose up --build
+```
 
-## ATTACCHI E VULNERABILITÀ
-Gli attacchi da cui dobbiamo proteggere la nostra web application sono contenuti in **attacchi.txt**, e dentro quel file troverete anche le modalità spiegate dal prof al lab per fixarle. Il file **da_modificare.txt** lo utilizzo per tenere traccia delle cose da fare per ogni sezione come login, signup, password_recovery, ecc. Nell'ultimo file specificato non ho incluso ogni singolo file (ad esempio, signup per l'utente include il file be_registration.php e activation.php), ma è una roadmap generale per vedere cosa manca. Io ora ho fixato tutto nel signup e mancavano solo i log nel login e ho migliorato alcuni files a livello di leggibilità.
+## Minacce mitigate e Strategie di sicurezza adottate
+Le principali vulnerabilità trattate a lezione e le relative contromisure implementate nell'applicazione web:
+1. **Directory bruteforcing**: cartelle e file sensibili sono stati posizionati al di fuori della directory pubblica (`/var/www/html`).
+2. **Handling user input**: uso della validazione tramite white-listing nel frontend (JS) e sanificazione/validazione nel backend; controllo del tipo di input ricevuto (stringa, intero, ecc.) e dell’estensione dei file caricati (***solo PDF***).
+3. **User enumeration**: messaggi di errore generici per evitare la divulgazione di informazioni (es. "Email o password errati").
+4. **Login bruteforcing**: richiesta obbligatoria di password complesse alla registrazione, assenza di messaggi informativi dettagliati, blocco dell’account dopo un numero stabilito di tentativi (sblocco tramite cambio password) e avviso all’utente in caso di tentativo di registrazione con il proprio indirizzo email.
 
-## SUMMARY
-Credo di non aver dimenticato niente, nel caso aveste qualche dubbio contattatemi. Io questi ultimi giorni non ci sto lavorando perchè sto preparando Network Security per il 4 giugno, ma rinizierò presto.
+   **NB**: per l’admin le contromisure sono identiche, ma lo sblocco dell’account è possibile solo contattando l’amministratore di sistema (sblocco manuale).
+5. **Secure credential storage**: utilizzo dell’algoritmo **bcrypt** per la creazione di hash con salt. Le funzioni `password_hash()` e `password_verify()` vengono utilizzate rispettivamente per la generazione e la verifica.
+6. **Token/Cookie**: trasmissione via HTTPS grazie all'attributo `cookie_secure => true` e protezione CSRF tramite `cookie_samesite => 'Strict'`.
+7. **Access control**: utilizzo delle sessioni per la verifica dei privilegi utente, ad esempio:
+   - `$_SESSION['loggedin']`: verifica dell'autenticazione
+   - `$_SESSION['user-type']`: determina l’accesso alle novelle (utente "free" o "premium")
+   - `$_SESSION['isadmin']`: verifica se l’utente è un amministratore
+8. **SQL Injection**: prevenzione mediante prepared statement.
+9. **OS Command Injection**: evitato l’uso di funzioni che eseguono chiamate al sistema.
+10. **Path traversal**: utilizzo di `realpath()` per ottenere i percorsi assoluti ed eliminare quelli relativi.
+11. **Type juggling**: uso esclusivo di strict comparison (===, !==).
+12. **Cross-Site Scripting** (**XSS**): mitigazione tramite `htmlspecialchars()`, sanificazione con `sanitizer.php` e uso degli header di risposta con **Content-Security-Policy** (definita in `config/apache-ssl.conf`). La **Same Origin Policy** fornisce ulteriore isolamento tra domini (*è implementata automaticamente dal browser*).
+13. **On-Site Request Forgery**: validazione degli input.
+14. **Cross-Site Request Forgery** (**CSRF**): protezione tramite `cookie_samesite => 'Strict'`.
+15. **Clickjacking**: mitigazione tramite la direttiva CSP frame-ancestors (in `config/apache-ssl.conf`).
+16. **EXTRA**:
+   - **Mutual authentication**: per garantire che solo la webapp autorizzata possa connettersi al database, è stata implementata l'autenticazione reciproca tramite certificati TLS firmati da una CA comune (vedere `config/01_ssl_init.sql` e `config/mysql.cnf`).
+
+## File non pubblici
+Alcuni file non sono stati inseriti nella directory pubblica (`/var/www/html`), rendendoli inaccessibili direttamente via web. Questo evita l'esposizione accidentale di codice o configurazioni sensibili. I file sono:
+- `logger.php`: definisce le funzioni per il logging degli eventi interni (es. login falliti, errori di validazione, registrazioni, ecc.).
+- `sanitizer.php`: contiene una classe per la validazione/sanificazione di input (email, username, stringhe generiche, ecc.).
+- `config_db.php`: inizializza la connessione al database e restituisce un **oggetto PDO** per eseguire query in modo sicuro.
+- `smtp_config/smtp_connection.php`: implementa una classe per la connessione sicura al server SMTP tramite **ENCRYPTION_SMTPS**, con funzionalità di test della connessione e invio email.
+
+## Logging
+La web application registra i log relativi alle seguenti categorie:
+1. Errori di validazione e sanificazione dei dati inseriti.
+2. Errori durante l'esecuzione delle operazioni, come ad esempio:
+   - Tentativo di riutilizzo di una password già utilizzata;
+   - Utente non trovato;
+   - Altri errori di sistema o applicativi.
+3. Messaggi di successo, tra cui:
+   - Login effettuato con successo;
+   - L’utente X ha caricato la novella Y;
+   - L’admin X ha modificato i privilegi dell’utente Z.
+
+I log sono uno strumento fondamentale per l’analisi e la risoluzione di eventuali incidenti. Alcuni esempi di scenari investigabili attraverso i log includono:
+- Un utente ha inserito un formato non valido nel campo email;
+- Un utente ha tentato di accedere a una risorsa senza disporre dei permessi necessari;
+- Un utente non autenticato ha provato a effettuare il login utilizzando tutte e cinque le possibilità disponibili.

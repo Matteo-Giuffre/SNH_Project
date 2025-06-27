@@ -30,6 +30,8 @@
     // Validate username
     $username = $_POST['username'];
     if (!($username = $sanitizer->sanitizeUsername($username))) {
+        logs_webapp("tried to use an invalid username format", getClientIP(), 'login.log');
+        
         http_response_code(400);
         echo json_encode(["status" => "error", 'message' => 'Invalid username']);
         exit; // Esci dallo script
@@ -38,6 +40,8 @@
     // Validate password
     $password = $_POST['password'];
     if (!$sanitizer->validatePassword($password)) {
+        logs_webapp("tried to use an invalid password format", getClientIP(), 'login.log');
+        
         http_response_code(400);
         echo json_encode(["status" => "error", 'message' => 'Invalid password']);
         exit; // Esci dallo script
@@ -53,6 +57,8 @@
 
     // Se lo username non esiste o l'account non è ancora abilitato
     if ($result === false || (int)$result['complete'] === 0) {
+        logs_webapp("tried to access a non-existent/uncomplete account", getClientIP(), 'login.log');
+        
         http_response_code(403);
         echo json_encode(["status" => "error", 'message' => 'Wrong credentials or too many failed attempts']);
         exit;
@@ -117,7 +123,7 @@
         $pdo->commit();
 
         // Logs the account lock
-        logs_webapp('account locked', $username, 'login.log');
+        logs_webapp("account locked (user ID: $userid)", getClientIP(), 'login.log');
 
         $email = $result['email'];
 

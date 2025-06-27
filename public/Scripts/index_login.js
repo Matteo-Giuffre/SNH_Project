@@ -47,7 +47,7 @@
 
         // Valida la password
         const password = document.getElementById('loginPassword').value.trim();
-        if (!password.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,64}$/)) {
+        if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{}\[\]|;:\'",.<>?\\/`~]).{8,64}$/)) {
             return;
         }
 
@@ -104,7 +104,7 @@
     // Validazione password
     const password = document.getElementById('signupPassword').value.trim();
     var passwordError = document.getElementById('passwordError');
-    if (!password.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,64}$/)) {
+    if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{}\[\]|;:\'",.<>?\\/`~]).{8,64}$/)) {
         passwordError.innerHTML = 'Invalid Password';
         isValid = false;
     } else {

@@ -7,6 +7,8 @@
 
     // Verifica se il token è presente nell'URL
     if (!isset($_GET['token'])) {
+        logs_webapp('bad request (reset token missing)', getClientIP(), 'password_recovery.log');
+
         http_response_code(400);
         echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
         exit;
@@ -24,6 +26,7 @@
 
     if (!$result) {
         logs_webapp("tried to use an invalid/expired token", getClientIP(), "password_recovery.log");
+        
         header("Location: expired.html");
         exit;
     }
@@ -50,7 +53,7 @@
                     Password must be at least 8 characters long and include:
                     - At least one Capital letter
                     - At least one number
-                    - At least one special character (@,$,!,%,*,?,&,_,-)
+                    - At least one special character
                 </p>
                 <label for="confirmpassword">Confirm Password</label>
                 <input type="password" id="confirmpassword" placeholder="Confirm password" required>

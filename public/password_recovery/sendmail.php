@@ -18,6 +18,8 @@
 
     // Ricevi l'email dal POST
     if (!isset($_POST['email'])) {
+        logs_webapp("bad request (email missing)", getClientIP(), "password_recovery.log");
+        
         http_response_code(400);
         echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
         exit;
@@ -25,7 +27,8 @@
     // Sanitize email
     $email = $_POST['email'];
     if (!($email = $sanitizer->sanitizeEmail($email))) {
-        logs_webapp("invalid format (email)", getClientIP(), "password_recovery.log");
+        logs_webapp("invalid email format", getClientIP(), "password_recovery.log");
+
         http_response_code(400);
         echo json_encode(["status" => "error", 'message' => 'Invalid mail']);
         exit;
@@ -40,7 +43,8 @@
 
     if ($result === false || $result['complete'] === 0) {
         // Email non trovata, risposta generica
-        logs_webapp("tried to recover the password with a non-existent email", getClientIP(), "password_recovery.log");
+        logs_webapp("tried to recover the password using a non-existent/non-active email", getClientIP(), "password_recovery.log");
+
         http_response_code(403);
         echo json_encode(["status" => "error", "message" => "Something gone wrong. Try later"]);
         exit;
@@ -95,7 +99,7 @@
             $pdo->commit();
 
             // Write logs about registration
-            logs_webapp("requested password recovery for user $userId", getClientIP(), "password_recovery.log");
+            logs_webapp("requested password recovery (user ID: $userid)", getClientIP(), "password_recovery.log");
 
             http_response_code(200);
             echo json_encode(['status' => 'success']);
@@ -104,7 +108,8 @@
 
     } catch (Exception $e) {
         $pdo->rollback();
-        logs_webapp("email not sent to user $userId", getClientIP(), "password_recovery.log");
+        logs_webapp("something gone wrong during password recovery request (user ID: $userid)", getClientIP(), "password_recovery.log");
+
         http_response_code(500);
         // Gestione errori PHPMailer
         echo json_encode(["status" => "error", 'message' => 'Something gone wrong. Try later']); 
