@@ -53,7 +53,7 @@
     // Recupera l'ID del file (assicurati che sia un valore valido)
     $id = intval($_POST['download-id']); // Usando un ID numerico per sicurezza
 
-    $stmt = $pdo->prepare("SELECT title, file_path FROM novels WHERE id = :id");
+    $stmt = $pdo->prepare("SELECT title, free, file_path FROM novels WHERE id = :id");
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
     $novel = $stmt->fetch();
@@ -63,6 +63,14 @@
 
         http_response_code(404);
         echo json_encode(["status" => "error", "message" => "Novel not found"]);
+        exit;
+    }
+    
+    if ((int)$novel['free'] !== 1) {
+        logs_webapp("tried to download a short novel (novel ID: $id)", $_SESSION['username'], 'novels.log');
+
+        http_response_code(400);
+        echo json_encode(["status" => "error", "message" => "Cannot download a short novel"]);
         exit;
     }
 
